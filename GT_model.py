@@ -1,4 +1,5 @@
 from pyics import Model
+import bassies_strats
 
 def state_to_dec(inp):
     """
@@ -24,10 +25,11 @@ class GTsim(Model):
     def __init__(self):
         Model.__init__(self)
 
-        self.make_param("p1_strat", "tit_for_tat")
+        self.make_param("p1_strat", "traitor")
         self.make_param("p2_strat", "tit_for_tat")
 
-        self.strat_library = {"tit_for_tat": tit_for_tat}
+        self.strat_library = {"tit_for_tat": tit_for_tat,
+                              "traitor": bassies_strats.traitor}
         self.p1_score = 0
         self.p2_score = 0
 
