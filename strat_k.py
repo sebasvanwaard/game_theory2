@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 def test(game_history, player_id):
     other_player_id = 1 - player_id
     length = len(game_history)
