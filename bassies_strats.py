@@ -1,6 +1,6 @@
 import numpy as np
 
-def traitor(game_history, player_id):
+def traitor(GTsim, player_id):
     """
     Traitor strat. This strat tries to win trust by playing silent. 
     If the opponent returns the favor 3 times in a row it starts talking until the opponent stops playing silent. 
@@ -12,11 +12,31 @@ def traitor(game_history, player_id):
         opponent_id = 1
 
     # initial moves
-    if len(game_history) < 3:
+    if len(GTsim.game_history) < 3:
         return 0
-    elif np.sum(game_history[-3:], axis = 0)[opponent_id] == 0:
+    elif np.sum(GTsim.game_history[-3:], axis = 0)[opponent_id] == 0:
         return 1
-    elif np.sum(game_history[-3:], axis = 0)[opponent_id] == 5:
+    elif np.sum(GTsim.game_history[-3:], axis = 0)[opponent_id] == 5:
         return 1
+    else:
+        return 0
 
-
+def thrower(GTsim, player_id):
+    """
+    This strategy will play to win. As long as its winning. Otherwise it will throw the game with random moves.
+    """
+    
+    opponent_id = 0
+    if player_id == 0:
+        opponent_id = 1
+    
+    if np.sum(GTsim.live_scores[player_id]) < GTsim.live_scores[opponent_id]:
+        return np.random.randint(0,2)
+    else:
+        return 0
+    
+def indecisive(GTsim, player_id):
+    """
+    Changes to a random stategy from the library every 10 steps
+    """
+    

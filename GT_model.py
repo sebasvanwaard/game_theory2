@@ -1,5 +1,8 @@
 from pyics import Model
+import numpy as np
+
 import bassies_strats
+import strat_k
 
 def state_to_dec(inp):
     """
@@ -12,13 +15,13 @@ def state_to_dec(inp):
     
     return base_10
 
-def tit_for_tat(game_history, player_id):
-    if len(game_history) == 0:
+def tit_for_tat(GTsim, player_id):
+    if len(GTsim.game_history) == 0:
         return 0
     if player_id == 0:
-        return game_history[-1][1]
+        return GTsim.game_history[-1][1]
     else:
-        return game_history[-1][0]
+        return GTsim.game_history[-1][0]
 
 class GTsim(Model):
 
@@ -26,12 +29,13 @@ class GTsim(Model):
         Model.__init__(self)
 
         self.make_param("p1_strat", "traitor")
-        self.make_param("p2_strat", "tit_for_tat")
+        self.make_param("p2_strat", "traitor")
 
         self.strat_library = {"tit_for_tat": tit_for_tat,
-                              "traitor": bassies_strats.traitor}
-        self.p1_score = 0
-        self.p2_score = 0
+                              "traitor": bassies_strats.traitor, "test": strat_k.test}
+        
+        # live score feed i=0: p1 score, i=1: p2 score
+        self.live_scores = np.array([0,0])
 
         # history is saved in list of list, every sublist is a gamestate [p1, p2] 0=silent 1=testify. Gamestates are chronologically saved
         # intial state
@@ -47,10 +51,14 @@ class GTsim(Model):
         pass
 
     def step(self):
-        self.game_history.append([self.strat_library[self.p1_strat](self.game_history, 0), 
-                                  self.strat_library[self.p1_strat](self.game_history, 1)])
-        self.score_history.append([self.rewards[state_to_dec(self.game_history[-1])][0],
-                                  self.rewards[state_to_dec(self.game_history[-1])][1]])
+        self.game_history.append([self.strat_library[self.p1_strat](self, 0), 
+                                  self.strat_library[self.p2_strat](self, 1)])
+
+        new_score = [self.rewards[state_to_dec(self.game_history[-1])][0],
+                                  self.rewards[state_to_dec(self.game_history[-1])][1]]
+
+        self.score_history.append(new_score)
+        self.live_scores += np.array(new_score)
 
     def reset(self):
         self.game_history = []
@@ -60,7 +68,12 @@ class GTsim(Model):
 
 sim = GTsim()
 
-for _ in range(10):
+for _ in range(500):
     sim.step()
-print(sim.game_history)
-print(sim.score_history)
+
+final_scores = np.sum(sim.score_history, axis = 0)
+
+# print(sim.game_history)
+# print(sim.score_history)
+print(sim.live_scores)
+print(final_scores)
