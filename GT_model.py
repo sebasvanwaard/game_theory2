@@ -30,6 +30,10 @@ class GTsim(Model):
 
         self.make_param("p1_strat", "traitor")
         self.make_param("p2_strat", "traitor")
+        self.make_param("width", 2)
+        self.make_param("height", 50)
+        self.t = 0
+        self.config = None
 
         self.strat_library = {"tit_for_tat": tit_for_tat,
                               "traitor": bassies_strats.traitor, "test": strat_k.test}
@@ -50,9 +54,22 @@ class GTsim(Model):
         included_strats = []
         pass
 
+    def reset(self):
+        self.t = 0
+        self.config = np.zeros((self.height, self.width))
+        self.live_scores = np.array([0,0])
+        self.game_history = []
+        self.score_history = []
+
     def step(self):
-        self.game_history.append([self.strat_library[self.p1_strat](self, 0), 
-                                  self.strat_library[self.p2_strat](self, 1)])
+        self.t += 1
+        if self.t > self.height:
+            return True
+        
+        move_1 = self.strat_library[self.p1_strat](self, 0)
+        move_2 = self.strat_library[self.p2_strat](self, 1)
+        self.game_history.append([move_1, move_2])
+        self.config[self.t] = np.array([move_1, move_2])
 
         new_score = [self.rewards[state_to_dec(self.game_history[-1])][0],
                                   self.rewards[state_to_dec(self.game_history[-1])][1]]
@@ -60,16 +77,24 @@ class GTsim(Model):
         self.score_history.append(new_score)
         self.live_scores += np.array(new_score)
 
-    def reset(self):
-        self.game_history = []
 
     def draw(self):
-        pass
+        import matplotlib
+        import matplotlib.pyplot as plt
+
+        plt.cla()
+        time = np.arange(self.t)
+        #plt.subplot(2, 1, 1)
+        plt.plot(time, [x[0] for x in self.score_history])
+        plt.plot(time, [x[1] for x in self.score_history])
+
+        #plt.subplot(2,1,2)
+        #plt.imshow(self.config, cmap=matplotlib.cm.binary)
 
 sim = GTsim()
 
-for _ in range(500):
-    sim.step()
+# for _ in range(500):
+#     sim.step()
 
 final_scores = np.sum(sim.score_history, axis = 0)
 
@@ -77,3 +102,7 @@ final_scores = np.sum(sim.score_history, axis = 0)
 # print(sim.score_history)
 print(sim.live_scores)
 print(final_scores)
+
+from pyics import GUI
+cx = GUI(sim)
+cx.start()
