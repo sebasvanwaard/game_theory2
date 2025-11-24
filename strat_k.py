@@ -68,6 +68,18 @@ def fitting(GTsim, player_id):
     else:
         return 0
 
+
+def tat_for_tit(GTsim, player_id):
+    """
+    Inverse of tit for tat, so starts mean, when other player was nice be mean, when other player was mean be nice
+    """
+    other_player_id = 1 - player_id
+    length = len(GTsim.game_history)
+    if length < 1:
+        return 1
+    return 1 - GTsim.game_history[-1][other_player_id]
+
+
 # sample = [1,1,1,1,0,1,0,0,1,1,0,0,1,1,0,0,1,1]
 
 # length = len(sample)
