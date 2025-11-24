@@ -44,24 +44,29 @@ def weighted_decision(GTsim, player_id):
     return choice
 
 
+def fitting(GTsim, player_id):
+    """
+    Fit polynomial to sum of other player's previous moves, depending on the coefficient of second order term we decide next move
+    """
+    other_player_id = 1 - player_id
+    length = len(GTsim.game_history)
+    # First moves nice
+    if length < 3:
+        return 0
     
+    # Make time axis and sum axis
+    time = np.arange(length)
+    data = [np.sum(GTsim.game_history[:i], axis=0)[other_player_id] for i in length]
 
+    # Fit polynomial degree 2
+    coeff = np.fit(time, data, 2)
+    lead = coeff[0]
 
-
-# def fitting(game_history, player_id):
-#     other_player_id = 1 - player_id
-#     length = len(game_history)
-#     # First move nice
-#     if length == 0:
-#         return 0
-#     N = 50
-#     # tit for tat until N
-#     if length < N:
-#         return game_history[-1][other_player_id]
-#     else:
-#         time = np.arange(length)
-#         data = [np.sum(game_history[i:], axis=0)[other_player_id] for i in length]
-#         coeff = np.fit(time, data, 2)
+    # If lead > 0 we see an increase in how mean the other player is getting otherwise it is getting nicer
+    if lead > 0:
+        return 1
+    else:
+        return 0
 
 # sample = [1,1,1,1,0,1,0,0,1,1,0,0,1,1,0,0,1,1]
 

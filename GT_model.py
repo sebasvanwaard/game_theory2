@@ -41,7 +41,8 @@ class GTsim(Model):
         self.live_scores = None
 
         self.strat_library = {"tit_for_tat": tit_for_tat, "random": random,
-                              "traitor": bassies_strats.traitor, "test": strat_k.test}
+                              "traitor": bassies_strats.traitor, "how_mean": strat_k.how_mean,
+                              "weighted_decision": strat_k.weighted_decision, "fitting": strat_k.fitting}
         
 
         # silent = 0, testify = 1
