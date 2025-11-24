@@ -16,12 +16,12 @@ def state_to_dec(inp):
     return base_10
 
 def tit_for_tat(GTsim, player_id):
-    if len(GTsim.game_history) == 0:
+    if len(GTsim.config) == 0:
         return 0
     if player_id == 0:
-        return GTsim.game_history[-1][1]
+        return GTsim.config[-1][1]
     else:
-        return GTsim.game_history[-1][0]
+        return GTsim.config[-1][0]
     
 def random(GTsim, player_id):
     return np.random.randint(0,2)
@@ -31,8 +31,8 @@ class GTsim(Model):
     def __init__(self):
         Model.__init__(self)
 
-        self.make_param("p1_strat", "random")
-        self.make_param("p2_strat", "random")
+        self.make_param("p1_strat", "tat_for_tit")
+        self.make_param("p2_strat", "how_mean")
         self.make_param("height", 50)
         
         self.t = 0
