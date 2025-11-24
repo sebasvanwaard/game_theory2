@@ -16,7 +16,8 @@ def state_to_dec(inp):
     return base_10
 
 def tit_for_tat(GTsim, player_id):
-    if len(GTsim.config) == 0:
+    length = GTsim.t
+    if length == 0:
         return 0
     if player_id == 0:
         return GTsim.config[-1][1]
