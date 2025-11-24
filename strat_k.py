@@ -73,7 +73,8 @@ def tat_for_tit(GTsim, player_id):
     length = GTsim.t
     if length == 0:
         return 1
-    return 1 - GTsim.config[-1][other_player_id]
+    else:
+        return 1 - GTsim.config[t-1][other_player_id]
 
 
 # sample = [1,1,1,1,0,1,0,0,1,1,0,0,1,1,0,0,1,1]
