@@ -8,21 +8,17 @@ def how_mean(GTsim, player_id):
     then dividing by the length of the game and when the mean is over 0.5 we also talk, otherwise stay silent
     """
     other_player_id = 1 - player_id
-    length = len(GTsim.config)
-    # First move nice
-    if length == 0:
+    length = GTsim.t
+    # First moves nice
+    if length < 3:
         return 0
-    N = 10
-    # tit for tat until N
-    if length < N:
-        return GTsim.config[-1][other_player_id]
+    meanie = np.sum(GTsim.config, axis=0)[other_player_id]
+    meanie /= length
+    print(meanie)
+    if meanie > 0.5:
+        return 1
     else:
-        meanie = np.sum(GTsim.config, axis=0)[other_player_id]
-        meanie /= length
-        if meanie > 0.5:
-            return 1
-        else:
-            return 0
+        return 0
         
 
 def weighted_decision(GTsim, player_id):
@@ -40,7 +36,7 @@ def weighted_decision(GTsim, player_id):
     w = silent/total
 
     # Random choice
-    choice = np.random.choice([0,1], [w, 1-2])
+    choice = np.random.choice(2, 1, [w, 1-2])
     return choice
 
 
@@ -49,7 +45,7 @@ def fitting(GTsim, player_id):
     Fit polynomial to sum of other player's previous moves, depending on the coefficient of second order term we decide next move
     """
     other_player_id = 1 - player_id
-    length = len(GTsim.config)
+    length = GTsim.t
     # First moves nice
     if length < 3:
         return 0
@@ -74,8 +70,8 @@ def tat_for_tit(GTsim, player_id):
     Inverse of tit for tat, so starts mean, when other player was nice be mean, when other player was mean be nice
     """
     other_player_id = 1 - player_id
-    length = len(GTsim.config)
-    if length < 1:
+    length = GTsim.t
+    if length == 0:
         return 1
     return 1 - GTsim.config[-1][other_player_id]
 
