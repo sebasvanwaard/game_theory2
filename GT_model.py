@@ -27,13 +27,14 @@ def tit_for_tat(GTsim, player_id):
 def random(GTsim, player_id):
     return np.random.randint(0,2)
 
+
 class GTsim(Model):
 
     def __init__(self):
         Model.__init__(self)
 
-        self.make_param("p1_strat", "tat_for_tit")
-        self.make_param("p2_strat", "how_mean")
+        self.make_param("p1_strat", "random")
+        self.make_param("p2_strat", "random")
         self.make_param("height", 50)
         
         self.t = 0
@@ -57,17 +58,37 @@ class GTsim(Model):
         included_strats = []
         pass
 
+    def execute_strat(self, strat):
+        # Check the amount of steps we want to look back
+        dim = int(np.emath.logn(4, len(strat)))
+        if self.t < dim:
+            return 0
+        else:
+            # Joined is a list of the history with [move1p1, move1p2, m2p1, m2p2, ....]
+            moves = self.config[self.t-dim : self.t]
+            joined = [0,0]
+            for m in moves:
+                joined += m
+            
+            # Gets the index of the history in the strat moveset and return next move
+            next_move_index = state_to_dec(joined[:2])
+            return strat[next_move_index]
+
+
     def reset(self):
         self.t = 0
         self.config = np.zeros((self.height, self.width))
         self.live_scores = np.array([[0,0]])
 
-    def step(self):
+    def step(self, evostrat = None):
         self.t += 1
         if self.t >= self.height:
             return True
         
-        move_1 = self.strat_library[self.p1_strat](self, 0)
+        if evostrat != None:
+            move_1 = self.execute_strat(evostrat)
+        else:
+            move_1 = self.strat_library[self.p1_strat](self, 0)
         move_2 = self.strat_library[self.p2_strat](self, 1)
         self.config[self.t-1] = np.array([move_1, move_2])
 
@@ -109,11 +130,47 @@ class GTsim(Model):
         plt.yticks([])
         plt.tight_layout()
 
-sim = GTsim()
 
 # for _ in range(500):
 #     sim.step()
 
-from pyics import GUI
-cx = GUI(sim)
-cx.start()
+# from pyics import GUI
+# cx = GUI(sim)
+# cx.start()
+
+#print(sim.list_to_strat([0,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1]))
+
+
+def list_to_strat(self, list):
+        length = len(list)
+        steps_back = np.emath.logn(4, length)
+        hisitory = self.config()
+
+
+def battle(sim, strat1, strat2, n=50):
+    # Reset config for battle
+    sim.reset()
+
+    # Check if strat1 is a type list
+    if isinstance(strat1, list):
+        sim.p2_strat = strat2
+        for _ in range(n):
+            sim.step(strat1)
+        return sim.live_scores[-1]
+
+    # Runs battle for two string strategies
+    else:
+        # Set strats
+        sim.p1_strat = strat1
+        sim.p2_strat = strat2
+
+        # Run the battle for n steps and return score
+        for _ in range(n):
+            sim.step()
+        return sim.live_scores[-1]
+
+
+def tournament(strat):
+
+sim = GTsim()
+print(battle(sim, [0,0,0,0], "tit_for_tat"))
