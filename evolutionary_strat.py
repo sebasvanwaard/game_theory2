@@ -134,7 +134,7 @@ def evolutionary_algorithm(depth, max_iter = np.inf, convergence_iteration = 10,
         if tot_iterations == max_iter:
             break
         
-        sys.stdout.write(f"\rCurrent iteration: {tot_iterations} || top score: {top_score}")
+        sys.stdout.write(f"\rCurrent iteration: {tot_iterations} || top score: {best_score}")
         sys.stdout.flush()
         tot_iterations += 1
     
