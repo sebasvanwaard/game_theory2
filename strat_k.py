@@ -14,7 +14,6 @@ def how_mean(GTsim, player_id):
         return 0
     meanie = np.sum(GTsim.config, axis=0)[other_player_id]
     meanie /= length
-    print(meanie)
     if meanie > 0.5:
         return 1
     else:
@@ -26,17 +25,18 @@ def weighted_decision(GTsim, player_id):
     Based on the simulation scoring, we decide the weights of how many times we should talk and how many times we should stay silent,
     Then picks random based on these weights
     """
-    other_player_id = 1 - player_id
     scoring = GTsim.rewards
 
     #Calculate the weights for staying silent
     weights = [w[0] for w in scoring]
-    silent = sum(weights[:2])
+    print(weights)
+    silent = weights[0] + weights[2]
     total = sum(weights)
     w = silent/total
 
     # Random choice
-    choice = np.random.choice(2, 1, [w, 1-2])
+    choice = np.random.choice([0,1], 1, p=[w, 1-w])[0]
+    print(choice)
     return choice
 
 
