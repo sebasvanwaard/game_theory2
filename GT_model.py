@@ -20,9 +20,9 @@ def tit_for_tat(GTsim, player_id):
     if length == 0:
         return 0
     if player_id == 0:
-        return GTsim.config[-1][1]
+        return GTsim.config[length-1][1]
     else:
-        return GTsim.config[-1][0]
+        return GTsim.config[length-1][0]
     
 def random(GTsim, player_id):
     return np.random.randint(0,2)
@@ -49,7 +49,7 @@ class GTsim(Model):
 
         # silent = 0, testify = 1
         # punishment/reward [p1_rew, p2_rew] i=0: both silent, i=1: p1-silent || p2-testify, i=2 p1-testify || p2-silent, i=3: both testify
-        self.rewards = [[1, 1], [-3, 0], [0, -3], [-2, -2]]
+        self.rewards = [[3, 3], [0, 5], [5, 0], [1, 1]]
 
     def setter_strat():
         included_strats = []
