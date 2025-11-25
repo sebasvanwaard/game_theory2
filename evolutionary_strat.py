@@ -186,7 +186,3 @@ if __name__ == '__main__':
 
 
 
-<<<<<<< HEAD
-=======
-print(evolutionary_algorithm(3))
->>>>>>> b0764fe09dad027ebc98a03c28ce9a4ebdf56770
