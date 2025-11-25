@@ -15,7 +15,7 @@ The additional moves are essentially the first d initial moves.
 
 def gen_random_strat(depth):
     strat = []
-    for _ in range(4^depth + depth):
+    for _ in range(4**depth + depth):
         strat.append(np.random.randint(0, 2))
     
     return strat
