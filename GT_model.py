@@ -1,5 +1,6 @@
 from pyics import Model
 import numpy as np
+import matplotlib.pyplot as plt
 
 import bassies_strats
 import strat_k
@@ -171,6 +172,27 @@ def battle(sim, strat1, strat2, n=50):
 
 
 def tournament(strat):
+    sim = GTsim()
+    sim.reset()
+    scores = []
+    bib = sim.strat_library
+    for key in bib.keys():
+        points = battle(sim, strat, key)
+        scores.append(points[0])
+    return sum(scores)
+
 
 sim = GTsim()
-print(battle(sim, [0,0,0,0], "tit_for_tat"))
+# print(battle(sim, [0,0,0,0], "tit_for_tat"))
+
+lijstje = []
+strats = sim.strat_library.keys()
+for s in strats:
+    lijstje.append(tournament(s))
+
+plt.figure(figsize=(12,8))
+
+plt.plot(strats, lijstje)
+plt.show()
+
+# print(tournament([0,0,0,0]))

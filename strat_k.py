@@ -29,7 +29,6 @@ def weighted_decision(GTsim, player_id):
 
     #Calculate the weights for staying silent
     weights = [w[0] for w in scoring]
-    print(weights)
     silent = weights[0] + weights[1]
     total = sum(weights)
     w = silent/total
