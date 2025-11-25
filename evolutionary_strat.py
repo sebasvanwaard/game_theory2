@@ -93,7 +93,7 @@ def evolve_new_strat_list(strats, n_strats_in_evo = 5, n_evolved_strats = 5, n_m
 
     return evolved_strats, top_scores[0]
 
-def evolutionary_algorithm(depth, max_iter = np.inf, convergence_iteration = 10, n_strats_in_evo = 5, n_evolved_strats = 5, n_mutated_strats = 2):
+def evolutionary_algorithm(depth, max_iter = np.inf, convergence_iteration = 40, n_strats_in_evo = 5, n_evolved_strats = 5, n_mutated_strats = 2):
     """
     Function to run an evolutionary algorithm that finds the best strat for a prisoners dillemma. The strat will look "depth" moves in the past
     to base its next move on.
@@ -140,4 +140,4 @@ def evolutionary_algorithm(depth, max_iter = np.inf, convergence_iteration = 10,
     
     return best_strat
 
-print(evolutionary_algorithm(1))
+print(evolutionary_algorithm(2))
