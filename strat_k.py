@@ -18,7 +18,7 @@ def how_mean(GTsim, player_id):
         return 1
     else:
         return 0
-        
+
 
 def weighted_decision(GTsim, player_id):
     """
@@ -30,13 +30,12 @@ def weighted_decision(GTsim, player_id):
     #Calculate the weights for staying silent
     weights = [w[0] for w in scoring]
     print(weights)
-    silent = weights[0] + weights[2]
+    silent = weights[0] + weights[1]
     total = sum(weights)
     w = silent/total
 
     # Random choice
     choice = np.random.choice([0,1], 1, p=[w, 1-w])[0]
-    print(choice)
     return choice
 
 
@@ -47,15 +46,15 @@ def fitting(GTsim, player_id):
     other_player_id = 1 - player_id
     length = GTsim.t
     # First moves nice
-    if length < 3:
+    if length < 4:
         return 0
     
     # Make time axis and sum axis
     time = np.arange(length)
-    data = [np.sum(GTsim.config[:i], axis=0)[other_player_id] for i in length]
+    data = [np.sum(GTsim.config[:i], axis=0)[other_player_id] for i in range(length)]
 
     # Fit polynomial degree 2
-    coeff = np.fit(time, data, 2)
+    coeff = np.polyfit(time, data, 2)
     lead = coeff[0]
 
     # If lead > 0 we see an increase in how mean the other player is getting otherwise it is getting nicer
@@ -67,30 +66,14 @@ def fitting(GTsim, player_id):
 
 def tat_for_tit(GTsim, player_id):
     """
-    Inverse of tit for tat, so starts mean, when other player was nice be mean, when other player was mean be nice
+    Inverse of tit for tat 2 moves back, so starts mean, when other player was nice 2 moves ago be mean, when other player was mean be nice
     """
     other_player_id = 1 - player_id
     length = GTsim.t
-    if length == 0:
+    if length < 2:
         return 1
     else:
-        return 1 - GTsim.config[length-1][other_player_id]
+        other_move = GTsim.config[length - 2][other_player_id]
+        return 1 - other_move
 
 
-# sample = [1,1,1,1,0,1,0,0,1,1,0,0,1,1,0,0,1,1]
-
-# length = len(sample)
-# time = np.arange(length)
-
-# data = []
-# for i in range(length):
-#     data.append(np.sum(sample[:i]))
-
-# polyfit = np.polyfit(time, data, 2)
-
-# new_time = time+len(time)
-
-# plt.plot(time, data)
-# plt.plot(time, polyfit[2] + polyfit[1]* time + polyfit[0] * time**2)
-# plt.plot(new_time, polyfit[2] + polyfit[1]* new_time + polyfit[0] * new_time**2)
-# plt.show()
