@@ -44,7 +44,9 @@ class GTsim(Model):
         self.strat_library = {"tit_for_tat": tit_for_tat, "random": random,
                               "traitor": bassies_strats.traitor, "how_mean": strat_k.how_mean,
                               "weighted_decision": strat_k.weighted_decision, "fitting": strat_k.fitting,
-                              "tat_for_tit": strat_k.tat_for_tit, "thrower": bassies_strats.thrower}
+                              "tat_for_tit": strat_k.tat_for_tit, "thrower": bassies_strats.thrower,
+                              "copy_cat": bassies_strats.copy_cat, "cry_baby": bassies_strats.easy_on_je_little_toes_gestept,
+                              "eerlijk": bassies_strats.eerlijk, "minder_eerlijk": bassies_strats.net_niet_helemaal_eerlijk}
         
 
         # silent = 0, testify = 1

@@ -44,9 +44,57 @@ def thrower(GTsim, player_id):
         else:
             return GTsim.config[-1][0]
     
-def indecisive(GTsim, player_id):
-    """
-    Changes to a random stategy from the library every 10 steps
-    """
-    
+def copy_cat(GTsim, player_id):
+    opponent_id = 1 - player_id
+    if GTsim.t == 0:
+        return 0
+    return GTsim.config[GTsim.t][opponent_id]
 
+def easy_on_je_little_toes_gestept(GTsim, player_id):
+    opponent_id = 1 - player_id
+    if GTsim.t == 0:
+        return 0
+    if np.sum(GTsim.config, axis = 0)[opponent_id] > 0:
+        return 1
+    else:
+        return 0
+
+def eerlijk(GTsim, player_id):
+    opponent_id = 1 - player_id
+    if GTsim.t == 0:
+        return 0
+    
+    if GTsim.t < 10:
+        opponent_sum = np.sum(GTsim.config[:GTsim.t], axis=0)[opponent_id]
+        defect_prob = opponent_sum/GTsim.t
+        if np.random.random() <= defect_prob:
+            return 1
+        else:
+            return 0
+    else:
+        opponent_sum = np.sum(GTsim.config[GTsim.t - 10:GTsim.t],axis=0)[opponent_id]
+        defect_prob = opponent_sum/10
+        if np.random.random() <= defect_prob:
+            return 1
+        else:
+            return 0
+
+def net_niet_helemaal_eerlijk(GTsim, player_id):
+    opponent_id = 1 - player_id
+    if GTsim.t == 0:
+        return 0
+    
+    if GTsim.t < 10:
+        opponent_sum = np.sum(GTsim.config[:GTsim.t], axis=0)[opponent_id]
+        defect_prob = opponent_sum/GTsim.t
+        if np.random.random() <= defect_prob:
+            return 1
+        else:
+            return 0
+    else:
+        opponent_sum = np.sum(GTsim.config[GTsim.t - 10:GTsim.t],axis=0)[opponent_id]
+        defect_prob = (opponent_sum/10)*1.25
+        if np.random.random() <= defect_prob:
+            return 1
+        else:
+            return 0
