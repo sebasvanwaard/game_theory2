@@ -12,31 +12,41 @@ def traitor(GTsim, player_id):
         opponent_id = 1
 
     # initial moves
-    if len(GTsim.game_history) < 3:
+    if GTsim.t < 3:
         return 0
-    elif np.sum(GTsim.game_history[-3:], axis = 0)[opponent_id] == 0:
+    elif np.sum(GTsim.config[GTsim.t - 3:GTsim.t], axis = 0)[opponent_id] == 0:
         return 1
-    elif np.sum(GTsim.game_history[-3:], axis = 0)[opponent_id] == 5:
-        return 1
+    elif GTsim.t > 5:
+        if np.sum(GTsim.config[GTsim.t-5:GTsim.t], axis = 0)[opponent_id] == 5:
+            return 1
+        else:
+            return 0
     else:
         return 0
 
 def thrower(GTsim, player_id):
     """
-    This strategy will play to win. As long as its winning. Otherwise it will throw the game with random moves.
+    This strategy will play to win (tit for tat). As long as its winning. Otherwise it will throw the game with random moves.
     """
     
     opponent_id = 0
     if player_id == 0:
         opponent_id = 1
     
-    if np.sum(GTsim.live_scores[player_id]) < GTsim.live_scores[opponent_id]:
+    if GTsim.live_scores[-1][player_id] < GTsim.live_scores[-1][opponent_id]:
         return np.random.randint(0,2)
     else:
-        return 0
+        length = GTsim.t
+        if length == 0:
+            return 0
+        if player_id == 0:
+            return GTsim.config[-1][1]
+        else:
+            return GTsim.config[-1][0]
     
 def indecisive(GTsim, player_id):
     """
     Changes to a random stategy from the library every 10 steps
     """
     
+
