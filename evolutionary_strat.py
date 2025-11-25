@@ -140,4 +140,4 @@ def evolutionary_algorithm(depth, max_iter = np.inf, convergence_iteration = 40,
     
     return best_strat
 
-print(evolutionary_algorithm(2))
+print(evolutionary_algorithm(3))
