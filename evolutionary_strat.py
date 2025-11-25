@@ -1,6 +1,8 @@
 import numpy as np
 import GT_model as gtm
 
+import sys
+
 """
 evolution is based on the 5 best performing strats. In which the best strat has a 50% chance of transfering their move, second best 25%, third 12.5% etc.
 
@@ -22,7 +24,7 @@ def mutate_strat(strat, mutation_probability = 0.05):
     new_strat = strat
 
     for move_i in range(len(strat)):
-        if np.random.random < mutation_probability:
+        if np.random.random() < mutation_probability:
             new_strat[move_i] = 1 - new_strat[move_i]
     
     return new_strat
@@ -84,14 +86,14 @@ def evolve_new_strat_list(strats, n_strats_in_evo = 5, n_evolved_strats = 5, n_m
     # generate n_mutated_strats new strats by mutation
     for strat in strats:
         for _ in range(n_mutated_strats):
-            evolved_strats.append(mutate_strat())
+            evolved_strats.append(mutate_strat(strat))
     
     # include the best performing strat in evolved_strats as is
     evolved_strats.append(top_strats[0])
 
-    return 
+    return evolved_strats, top_scores[0]
 
-def evolutionary_algorithm(depth, convergence_iteration = 10, n_strats_in_evo = 5, n_evolved_strats = 5, n_mutated_strats = 2):
+def evolutionary_algorithm(depth, max_iter = np.inf, convergence_iteration = 10, n_strats_in_evo = 5, n_evolved_strats = 5, n_mutated_strats = 2):
     """
     Function to run an evolutionary algorithm that finds the best strat for a prisoners dillemma. The strat will look "depth" moves in the past
     to base its next move on.
@@ -107,6 +109,8 @@ def evolutionary_algorithm(depth, convergence_iteration = 10, n_strats_in_evo = 
 
     after convergence, return the best strat
     """
+
+    tot_iterations = 0
 
     best_strat = None
     best_score = -1
@@ -125,6 +129,14 @@ def evolutionary_algorithm(depth, convergence_iteration = 10, n_strats_in_evo = 
             conv_iter = 0
         else:
             conv_iter += 1
+
+        if tot_iterations == max_iter:
+            break
+        
+        sys.stdout.write(f"\rCurrent iteration: {tot_iterations}")
+        sys.stdout.flush()
+        tot_iterations += 1
     
     return best_strat
 
+print(evolutionary_algorithm(1))

@@ -182,17 +182,17 @@ def tournament(strat):
     return sum(scores)
 
 
-sim = GTsim()
-# print(battle(sim, [0,0,0,0], "tit_for_tat"))
+# sim = GTsim()
+# # print(battle(sim, [0,0,0,0], "tit_for_tat"))
 
-lijstje = []
-strats = sim.strat_library.keys()
-for s in strats:
-    lijstje.append(tournament(s))
+# lijstje = []
+# strats = sim.strat_library.keys()
+# for s in strats:
+#     lijstje.append(tournament(s))
 
-plt.figure(figsize=(12,8))
+# plt.figure(figsize=(12,8))
 
-plt.plot(strats, lijstje)
-plt.show()
+# plt.plot(strats, lijstje)
+# plt.show()
 
 # print(tournament([0,0,0,0]))
