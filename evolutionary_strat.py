@@ -126,6 +126,7 @@ def evolutionary_algorithm(depth, max_iter = np.inf, convergence_iteration = 10,
         new_strats, top_score = evolve_new_strat_list(strats, n_strats_in_evo, n_evolved_strats, n_mutated_strats)
         if top_score > best_score:
             best_strat = new_strats[-1]
+            best_score = top_score
             conv_iter = 0
         else:
             conv_iter += 1
