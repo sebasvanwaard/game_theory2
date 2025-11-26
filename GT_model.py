@@ -1,9 +1,9 @@
-from pyics import Model
 import numpy as np
-import matplotlib.pyplot as plt
+import pandas as pd
 
 import bassies_strats
 import strat_k
+from pyics import Model
 
 
 def state_to_dec(inp):
@@ -54,10 +54,12 @@ class GTsim(Model):
     def __init__(self):
         Model.__init__(self)
 
+        # Adjustabel parameters
         self.make_param("p1_strat", "random")
         self.make_param("p2_strat", "random")
         self.make_param("height", 50)
 
+        # 
         self.t = 0
         self.width = 2
         self.config = None
@@ -81,13 +83,10 @@ class GTsim(Model):
         # || p2-testify, i=2 p1-testify || p2-silent, i=3: both testify
         self.rewards = [[3, 3], [0, 5], [5, 0], [1, 1]]
 
-    def setter_strat(self):
-        included_strats = []
-        pass
-
     def execute_strat(self, strat):
         """
-        For a list strategy (from the evolutionary strategy) execute the move from the moveset depending on the history
+        For a list strategy (from the evolutionary strategy) execute the move from the moveset
+        depending on the history
 
         :param self: Model
         :param strat: moveset list of the strategy
@@ -119,23 +118,25 @@ class GTsim(Model):
         self.config = np.zeros((self.height, self.width))
         self.live_scores = np.array([[0, 0]])
 
-    def step(self, evostrat=None):
+    def step(self, evostrat1=None, evostrat2=None):
         """
         Does a step in the simulation, also checks if we have an evolutionary strat by checking
         if there is another input given
         
         :param self: Model
-        :param evostrat: moveset list of the strategy
+        :param evostrat: moveset list of the evolutionary strategy
         """
         self.t += 1
         if self.t >= self.height:
             return True
 
-        if evostrat is not None:
-            move_1 = self.execute_strat(evostrat)
+        if evostrat1 is not None:
+            move_1 = self.execute_strat(evostrat1)
+        if evostrat2 is not None:
+            move_2 = self.execute_strat(evostrat2)
         else:
             move_1 = self.strat_library[self.p1_strat](self, 0)
-        move_2 = self.strat_library[self.p2_strat](self, 1)
+            move_2 = self.strat_library[self.p2_strat](self, 1)
         self.config[self.t - 1] = np.array([move_1, move_2])
 
         new_score = np.array([self.rewards[state_to_dec(self.config[self.t - 1])][0],
@@ -151,9 +152,8 @@ class GTsim(Model):
         
         :param self: Model
         """
-        import matplotlib
-        import matplotlib.pyplot as plt
         import matplotlib.patches as mpatches
+        import matplotlib.pyplot as plt
 
         if self.t >= self.height:
             return
@@ -217,9 +217,21 @@ def battle(sim, strat1, strat2, n=50):
 
     # Check if strat1 is a type list
     if isinstance(strat1, list):
-        sim.p2_strat = strat2
+        if isinstance(strat2, list):
+            for _ in range(n):
+                sim.step(strat1, strat2)
+            return sim.live_scores[-1]
+        else:
+            sim.p2_strat = strat2
+            for _ in range(n):
+                sim.step(strat1)
+            return sim.live_scores[-1]
+    
+    # Check if strat2 is a type list
+    if isinstance(strat2, list):
+        sim.p2_strat = strat1
         for _ in range(n):
-            sim.step(strat1)
+            sim.step(strat2)
         return sim.live_scores[-1]
 
     # Runs battle for two string strategies
@@ -235,7 +247,7 @@ def battle(sim, strat1, strat2, n=50):
 
 
 def tournament(strat):
-    sim = GTsim()
+    
     sim.reset()
     scores = []
     bib = sim.strat_library
@@ -245,7 +257,7 @@ def tournament(strat):
     return sum(scores)
 
 
-# sim = GTsim()
+
 # # print(battle(sim, [0,0,0,0], "tit_for_tat"))
 
 # lijstje = []
@@ -259,3 +271,46 @@ def tournament(strat):
 # plt.show()
 
 # print(tournament([0,0,0,0]))
+
+sim = GTsim()
+
+def result_matrix(sim, evostrat=False):
+    """
+    Create a result matrix of battles between strategies.
+    
+    :param sim: Model
+    :param evostrat: Moveset list of the evolutionary strategy
+    :return: Matrix with results of every battle
+    :rtype: DataFrame
+    """
+    # Strategy labels
+    strat_labels = list(sim.strat_library.keys())
+    # Strategy objects used in battle
+    strat_objects = list(sim.strat_library.keys())
+    
+    # Add the evolutionary strategy if there
+    if evostrat:
+        strat_labels.append("evostrat")   # DataFrame label
+        strat_objects.append(evostrat)    # actual object used in battle
+
+    n = len(strat_labels)
+    result = np.zeros((n, n))
+
+    # Fill matrix with battle results
+    for i, s1 in enumerate(strat_objects):
+        for j, s2 in enumerate(strat_objects):
+            result[i, j] = battle(sim, s1, s2)[0]
+
+    # Create DataFrame with labels
+    df = pd.DataFrame(result, index=strat_labels, columns=strat_labels)
+    df["Total"] = df.sum(axis=1)
+
+    # Sort rows by Total, get this order and reorder columns adding total as last
+    df = df.sort_values("Total", ascending=False)
+    new_order = df.index.tolist()
+    df = df[new_order + ["Total"]]
+
+    return df
+
+
+print(result_matrix(sim, [0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]))
