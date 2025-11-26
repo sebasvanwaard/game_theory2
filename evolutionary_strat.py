@@ -1,5 +1,6 @@
 import numpy as np
 import GT_model as gtm
+import csv
 
 import sys
 
@@ -100,10 +101,10 @@ class EvoAlgorithm():
         for strat in strats:
             tourney_final_score = gtm.tournament(strat)
             strats_scores.append(tourney_final_score)
-        
+
         # get the top 5 scores and their corresponding strats, save in top_scores and top_strats
         # strats are ordered best-worst
-        top_scores = sorted(strats_scores)[:self.n_strats_in_evo]
+        top_scores = sorted(strats_scores, reverse=True)[:self.n_strats_in_evo]
         top_strats_indexes = [strats_scores.index(score) for score in top_scores]
         top_strats = [strats[i] for i in top_strats_indexes]
 
@@ -120,7 +121,7 @@ class EvoAlgorithm():
         # include the best performing strat in evolved_strats as is
         evolved_strats.append(top_strats[0])
 
-        return evolved_strats, top_scores[0]
+        return evolved_strats, top_scores
 
     def execute(self):
         """
@@ -152,10 +153,10 @@ class EvoAlgorithm():
         conv_iter = 0
         while conv_iter < self.convergence_iteration:
             # evolve the strats
-            new_strats, top_score = self.evolve_new_strat_list(strats)
-            if top_score > best_score:
+            new_strats, top_scores = self.evolve_new_strat_list(strats)
+            if top_scores[0] > best_score:
                 best_strat = new_strats[-1]
-                best_score = top_score
+                best_score = top_scores[0]
                 conv_iter = 0
             else:
                 conv_iter += 1
@@ -169,6 +170,28 @@ class EvoAlgorithm():
         
         return best_strat, best_score
 
+    def experiment_good_or_bad(self, filename, n = 10**5):
+        tot_iterations = 0
+
+        strats_and_scores = []
+        while tot_iterations < n:
+            # evolve the strats
+            strat = self.gen_random_strat()
+            score = gtm.tournament(strat)
+            strats_and_scores.append([strat, score, sum(strat)])
+
+            if tot_iterations == self.max_iter:
+                break
+
+            sys.stdout.write(f"\rCurrent iteration: {tot_iterations}")
+            sys.stdout.flush()
+            tot_iterations += 1
+        
+        with open(filename, "a", newline="") as f:
+            writer = csv.writer(f)
+            writer.writerows(strats_and_scores)
+        
+        return strats_and_scores
 
 def print_results(strats, scores):
     """
@@ -183,26 +206,30 @@ def print_results(strats, scores):
     for i in range(sorted_sas.shape[0]):
         print(f"#{i + 1} | {sorted_sas[i][0]} | {sorted_sas[i][1]}")
 
-
-
 if __name__ == '__main__':
-    n_strats = 5
+    n_strats = 10
     best_strats = []
     best_scores = []
     
     evo = EvoAlgorithm()
-    evo.convergence_iteration = 5
-    evo.depth = 1
-    evo.max_iter = 10
+    evo.convergence_iteration = 100
+    evo.depth = 3
+    evo.max_iter = 100
+    evo.mutation_probability = 0.1
 
     for _ in range(n_strats):
         best_strat, best_score = evo.execute()
         best_strats.append(str(best_strat))
         best_scores.append(best_score)
-    
-    # print(best_strats, best_scores)
-    
+
     print_results(best_strats, best_scores)
+
+# if __name__ == '__main__':
+#     evo = EvoAlgorithm()
+    
+#     evo.depth = 3
+#     evo.experiment_good_or_bad("depth3n1000000.txt", n = 10**1)
+
 
 
 

@@ -247,7 +247,8 @@ def battle(sim, strat1, strat2):
 
 
 def tournament(strat):
-    
+    sim = GTsim()
+
     sim.reset()
     scores = []
     bib = sim.strat_library
@@ -255,22 +256,6 @@ def tournament(strat):
         points = battle(sim, strat, key)
         scores.append(points[0])
     return sum(scores)
-
-
-
-# # print(battle(sim, [0,0,0,0], "tit_for_tat"))
-
-# lijstje = []
-# strats = sim.strat_library.keys()
-# for s in strats:
-#     lijstje.append(tournament(s))
-
-# plt.figure(figsize=(12,8))
-
-# plt.plot(strats, lijstje)
-# plt.show()
-
-# print(tournament([0,0,0,0]))
 
 
 def result_matrix(sim, evostrat=False):
@@ -331,9 +316,9 @@ evostrat3 = [0, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1
              0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 1, 1,
              1, 1, 1, 0, 0, 0, 1, 0, 1, 0]
 
-sim = GTsim()
-sim.height = 200
+# sim = GTsim()
+# sim.height = 200
 
-df = result_matrix(sim, evostrat1)
-# df.to_csv('test.csv')
-print(df)
+# df = result_matrix(sim, evostrat1)
+# # df.to_csv('test.csv')
+# print(df)
