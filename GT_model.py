@@ -8,7 +8,9 @@ import strat_k
 
 def state_to_dec(inp):
     """
-    Convert a
+    Convert a list of binary digits to their base 10 equivalent
+
+    :param inp: list of binary digits
     """
     base_10 = 0
 
@@ -19,6 +21,12 @@ def state_to_dec(inp):
 
 
 def tit_for_tat(GTsim, player_id):
+    """
+    tit_for_tat strategy
+
+    :param GTsim: Model
+    :param player_id: player id in the match
+    """
     length = GTsim.t
     if length == 0:
         return 0
@@ -29,10 +37,19 @@ def tit_for_tat(GTsim, player_id):
 
 
 def random(GTsim, player_id):
+    """
+    random strategy
+
+    :param GTsim: Model
+    :param player_id: player id in the match
+    """
     return np.random.randint(0, 2)
 
 
 class GTsim(Model):
+    """
+    Simulation of two strategies playing agains eachother
+    """
 
     def __init__(self):
         Model.__init__(self)
@@ -46,23 +63,35 @@ class GTsim(Model):
         self.config = None
         self.live_scores = None
 
-        self.strat_library = {"tit_for_tat": tit_for_tat, "random": random,
-                              "traitor": bassies_strats.traitor, "how_mean": strat_k.how_mean,
-                              "weighted_decision": strat_k.weighted_decision, "fitting": strat_k.fitting,
-                              "tat_for_tit": strat_k.tat_for_tit, "thrower": bassies_strats.thrower,
-                              "copy_cat": bassies_strats.copy_cat, "cry_baby": bassies_strats.easy_on_je_little_toes_gestept,
-                              "eerlijk": bassies_strats.eerlijk, "minder_eerlijk": bassies_strats.net_niet_helemaal_eerlijk}
+        self.strat_library = {"tit_for_tat": tit_for_tat,
+                              "random": random,
+                              "traitor": bassies_strats.traitor,
+                              "how_mean": strat_k.how_mean,
+                              "weighted_decision": strat_k.weighted_decision,
+                              "fitting": strat_k.fitting,
+                              "tat_for_tit": strat_k.tat_for_tit,
+                              "thrower": bassies_strats.thrower,
+                              "copy_cat": bassies_strats.copy_cat,
+                              "cry_baby": bassies_strats.easy_on_je_little_toes_gestept,
+                              "eerlijk": bassies_strats.eerlijk,
+                              "minder_eerlijk": bassies_strats.net_niet_helemaal_eerlijk}
 
         # silent = 0, testify = 1
         # punishment/reward [p1_rew, p2_rew] i=0: both silent, i=1: p1-silent
         # || p2-testify, i=2 p1-testify || p2-silent, i=3: both testify
         self.rewards = [[3, 3], [0, 5], [5, 0], [1, 1]]
 
-    def setter_strat():
+    def setter_strat(self):
         included_strats = []
         pass
 
     def execute_strat(self, strat):
+        """
+        For a list strategy (from the evolutionary strategy) execute the move from the moveset depending on the history
+
+        :param self: Model
+        :param strat: moveset list of the strategy
+        """
         # Check the amount of steps we want to look back
         dim = int(np.emath.logn(4, len(strat)))
         if self.t < dim:
@@ -81,11 +110,23 @@ class GTsim(Model):
             return strat[next_move_index]
 
     def reset(self):
+        """
+        Resets the model
+        
+        :param self: Model
+        """
         self.t = 0
         self.config = np.zeros((self.height, self.width))
         self.live_scores = np.array([[0, 0]])
 
     def step(self, evostrat=None):
+        """
+        Does a step in the simulation, also checks if we have an evolutionary strat by checking
+        if there is another input given
+        
+        :param self: Model
+        :param evostrat: moveset list of the strategy
+        """
         self.t += 1
         if self.t >= self.height:
             return True
@@ -104,6 +145,12 @@ class GTsim(Model):
             [self.live_scores, (self.live_scores[-1, :] + np.array(new_score))])
 
     def draw(self):
+        """
+        Draws a plot of the simulation scoring of the two strategies against the time, also
+        shows the moveset of both strategies in a bar below
+        
+        :param self: Model
+        """
         import matplotlib
         import matplotlib.pyplot as plt
         import matplotlib.patches as mpatches
@@ -155,16 +202,16 @@ class GTsim(Model):
 # cx = GUI(sim)
 # cx.start()
 
-# print(sim.list_to_strat([0,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1]))
-
-
-def list_to_strat(self, list):
-    length = len(list)
-    steps_back = np.emath.logn(4, length)
-    hisitory = self.config()
-
 
 def battle(sim, strat1, strat2, n=50):
+    """
+    Does a battle between two strategies and gives the final score afther n moves
+    
+    :param sim: Model
+    :param strat1: first strategy
+    :param strat2: second strategy
+    :param n: duration of the battle between the strategies
+    """
     # Reset config for battle
     sim.reset()
 
