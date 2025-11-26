@@ -15,10 +15,28 @@ The additional moves are essentially the first d initial moves.
 
 class EvoAlgorithm():
     def __init__(self):
-        self.mutation_probability = 0.05
+        """
+        Class to run an evolutionary algorithm. Every evolution a certain amount of new strats is evolved (n_evolved_strats). 
+        This is done based on x amount of top performing strats (can be set with n_strats_in_evo).
+        An additional x amount of strats is mutated per evolved strat (n_mutated_strats). So the amount of mutated strats is equal to
+        n_evolved_strats * n_mutated_strats. Total amount of new strats that is generated each iteration is n_evolved_strats * (n_mutated_strats + 1).
+        
+        parameters:
+        n_strats_in_evo: the amount of top performing strats used in evolution
+        n_evolved_strats: the amount of new strats that is produced in evolution
+        n_mutated_strats: the amount of new strats that is mutated, per evolved strat
+        mutation_probability: the probability of a mutation happening for a certain game_state. 
+                            For larger depths this value might have to be higher.
+        
+        depth: the amount of gamestates the evolution looks in the past to base its decisions on
+        max_iter: the maximum amount of iterations of the entire evolution algorithm, mostly useful for testing
+        convergence_iteration: the amount of iterations to keep looking for a better strat after not finding a better one.                    
+        """
+
         self.n_strats_in_evo = 5
         self.n_evolved_strats = 5
         self.n_mutated_strats = 2
+        self.mutation_probability = 0.05
 
         self.depth = 2
         self.max_iter = np.inf
@@ -153,6 +171,9 @@ class EvoAlgorithm():
 
 
 def print_results(strats, scores):
+    """
+    Print the leaderboards of found strats, best strat takes the win
+    """
     strats = np.array(strats)
     scores  = np.array(scores)
     strats_and_scores = np.column_stack((strats, scores))
