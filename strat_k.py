@@ -27,14 +27,14 @@ def weighted_decision(GTsim, player_id):
     """
     scoring = GTsim.rewards
 
-    #Calculate the weights for staying silent
+    # Calculate the weights for staying silent
     weights = [w[0] for w in scoring]
     silent = weights[0] + weights[1]
     total = sum(weights)
-    w = silent/total
+    w = silent / total
 
     # Random choice
-    choice = np.random.choice([0,1], 1, p=[w, 1-w])[0]
+    choice = np.random.choice([0, 1], 1, p=[w, 1 - w])[0]
     return choice
 
 
@@ -47,16 +47,18 @@ def fitting(GTsim, player_id):
     # First moves nice
     if length < 4:
         return 0
-    
+
     # Make time axis and sum axis
     time = np.arange(length)
-    data = [np.sum(GTsim.config[:i], axis=0)[other_player_id] for i in range(length)]
+    data = [np.sum(GTsim.config[:i], axis=0)[other_player_id]
+            for i in range(length)]
 
     # Fit polynomial degree 2
     coeff = np.polyfit(time, data, 2)
     lead = coeff[0]
 
-    # If lead > 0 we see an increase in how mean the other player is getting otherwise it is getting nicer
+    # If lead > 0 we see an increase in how mean the other player is getting
+    # otherwise it is getting nicer
     if lead > 0:
         return 1
     else:
@@ -74,5 +76,3 @@ def tat_for_tit(GTsim, player_id):
     else:
         other_move = GTsim.config[length - 2][other_player_id]
         return 1 - other_move
-
-
