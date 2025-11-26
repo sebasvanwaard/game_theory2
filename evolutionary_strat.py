@@ -226,8 +226,10 @@ def print_results(strats, scores):
     for i in range(sorted_sas.shape[0]):
         print(f"#{i + 1} | {sorted_sas[i][0]} | {sorted_sas[i][1]}")
 
+"""
+run to start the evolutionary algorithm
+"""
 
-# run to start the evolutionary algorithm
 # if __name__ == '__main__':
 #     n_strats = 10
 #     best_strats = []
@@ -246,8 +248,10 @@ def print_results(strats, scores):
 
 #     print_results(best_strats, best_scores)
 
-# run to start random strat algorithm, to produce random strats and their scores in order to investige correlation between,
-# "niceness" (how many states lead to talking) and performance
+"""
+run to start random strat algorithm, to produce random strats and their scores in order to investige correlation between,
+"niceness" (how many states lead to talking) and performance
+"""
 if __name__ == '__main__':
     evo = EvoAlgorithm()
     
