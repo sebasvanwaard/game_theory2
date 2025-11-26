@@ -40,6 +40,7 @@ def weighted_decision(GTsim, player_id):
 def fitting(GTsim, player_id):
     """
     Fit polynomial to sum of other player's previous moves, depending on the coefficient of second order term we decide next move
+    this corresponds to the acceleration i.e. the increase of someone's amount of talking
     """
     other_player_id = 1 - player_id
     length = GTsim.t

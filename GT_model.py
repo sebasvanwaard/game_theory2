@@ -105,7 +105,7 @@ class GTsim(Model):
 
             # Gets the index of the history in the strat moveset and return
             # next move
-            next_move_index = state_to_dec(joined[:2])
+            next_move_index = state_to_dec(joined)
             return strat[next_move_index]
 
     def reset(self):
@@ -203,7 +203,7 @@ class GTsim(Model):
 # cx.start()
 
 
-def battle(sim, strat1, strat2, n=50):
+def battle(sim, strat1, strat2):
     """
     Does a battle between two strategies and gives the final score afther n moves
     
@@ -218,19 +218,19 @@ def battle(sim, strat1, strat2, n=50):
     # Check if strat1 is a type list
     if isinstance(strat1, list):
         if isinstance(strat2, list):
-            for _ in range(n):
+            for _ in range(sim.height):
                 sim.step(strat1, strat2)
             return sim.live_scores[-1]
         else:
             sim.p2_strat = strat2
-            for _ in range(n):
+            for _ in range(sim.height):
                 sim.step(strat1)
             return sim.live_scores[-1]
     
     # Check if strat2 is a type list
     if isinstance(strat2, list):
         sim.p2_strat = strat1
-        for _ in range(n):
+        for _ in range(sim.height):
             sim.step(strat2)
         return sim.live_scores[-1]
 
@@ -241,7 +241,7 @@ def battle(sim, strat1, strat2, n=50):
         sim.p2_strat = strat2
 
         # Run the battle for n steps and return score
-        for _ in range(n):
+        for _ in range(sim.height):
             sim.step()
         return sim.live_scores[-1]
 
@@ -272,7 +272,6 @@ def tournament(strat):
 
 # print(tournament([0,0,0,0]))
 
-sim = GTsim()
 
 def result_matrix(sim, evostrat=False):
     """
@@ -312,5 +311,29 @@ def result_matrix(sim, evostrat=False):
 
     return df
 
+evostrat1 = [0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1,
+            0, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0,
+            1, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]
 
-print(result_matrix(sim, [0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]))
+evostrat2 = [1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1,
+             1, 1, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 1,
+             0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0]
+
+evostrat3 = [0, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1,
+             1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0,
+             1, 1, 0, 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0,
+             0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 1,
+             1, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1,
+             0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1,
+             1, 0, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1,
+             0, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0,
+             0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0,
+             0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 1, 1,
+             1, 1, 1, 0, 0, 0, 1, 0, 1, 0]
+
+sim = GTsim()
+sim.height = 200
+
+df = result_matrix(sim, evostrat1)
+# df.to_csv('test.csv')
+print(df)
