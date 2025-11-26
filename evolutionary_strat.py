@@ -8,7 +8,7 @@ import sys
 evolution is based on the 5 best performing strats. In which the best strat has a 50% chance of transfering their move, second best 25%, third 12.5% etc.
 
 strat format:
-- The first 2^d (d=depth) elements of the strat list encode for the different situations in binary. E.g.
+- The first 4^d (d=depth) elements of the strat list encode for the different situations in binary. E.g.
 - An additional d elements of the list are added to encode the first t iterations in which t < depth 
 (because you cannot make valid assumptions about the nature of any moves that haven't happened yet.)
 The additional moves are essentially the first d initial moves.
@@ -170,22 +170,42 @@ class EvoAlgorithm():
         
         return best_strat, best_score
 
-    def experiment_good_or_bad(self, filename, n = 10**5):
+    def make_strat_with_n_talk(self, n):
+        strat = [0 for _ in range(4**self.depth + self.depth)]
+        while sum(strat) < n:
+            strat[np.random.randint(len(strat))] = 1
+        
+        return strat
+
+
+    def experiment_good_or_bad(self, filename, n = 10**5, write_after = 1000):
         tot_iterations = 0
 
         strats_and_scores = []
+        strat_sum = 0
         while tot_iterations < n:
             # evolve the strats
-            strat = self.gen_random_strat()
+            strat = self.make_strat_with_n_talk(strat_sum)
             score = gtm.tournament(strat)
             strats_and_scores.append([strat, score, sum(strat)])
 
-            if tot_iterations == self.max_iter:
+            if tot_iterations % write_after == 0:
+                with open(filename, "a", newline="") as f:
+                    writer = csv.writer(f)
+                    writer.writerows(strats_and_scores)
+                strats_and_scores = []
+
+            if tot_iterations > self.max_iter:    
                 break
 
             sys.stdout.write(f"\rCurrent iteration: {tot_iterations}")
             sys.stdout.flush()
+
             tot_iterations += 1
+            if strat_sum == 4**self.depth + self.depth:
+                strat_sum = 0
+            else:
+                strat_sum += 1
         
         with open(filename, "a", newline="") as f:
             writer = csv.writer(f)
@@ -206,29 +226,33 @@ def print_results(strats, scores):
     for i in range(sorted_sas.shape[0]):
         print(f"#{i + 1} | {sorted_sas[i][0]} | {sorted_sas[i][1]}")
 
-if __name__ == '__main__':
-    n_strats = 10
-    best_strats = []
-    best_scores = []
-    
-    evo = EvoAlgorithm()
-    evo.convergence_iteration = 100
-    evo.depth = 3
-    evo.max_iter = 100
-    evo.mutation_probability = 0.1
 
-    for _ in range(n_strats):
-        best_strat, best_score = evo.execute()
-        best_strats.append(str(best_strat))
-        best_scores.append(best_score)
-
-    print_results(best_strats, best_scores)
-
+# run to start the evolutionary algorithm
 # if __name__ == '__main__':
-#     evo = EvoAlgorithm()
+#     n_strats = 10
+#     best_strats = []
+#     best_scores = []
     
+#     evo = EvoAlgorithm()
+#     evo.convergence_iteration = 100
 #     evo.depth = 3
-#     evo.experiment_good_or_bad("depth3n1000000.txt", n = 10**1)
+#     evo.max_iter = 100
+#     evo.mutation_probability = 0.1
+
+#     for _ in range(n_strats):
+#         best_strat, best_score = evo.execute()
+#         best_strats.append(str(best_strat))
+#         best_scores.append(best_score)
+
+#     print_results(best_strats, best_scores)
+
+# run to start random strat algorithm, to produce random strats and their scores in order to investige correlation between,
+# "niceness" (how many states lead to talking) and performance
+if __name__ == '__main__':
+    evo = EvoAlgorithm()
+    
+    evo.depth = 3
+    evo.experiment_good_or_bad("depth3n1000000.txt", n = 10**6)
 
 
 

@@ -1,8 +1,9 @@
 import numpy as np
 import pandas as pd
 
-import bassies_strats
-import strat_k
+import strats.bassies_strats as bassies_strats
+import strats.strat_k as strat_k
+import strats.general_strats as general_strats
 from pyics import Model
 
 
@@ -19,33 +20,6 @@ def state_to_dec(inp):
 
     return base_10
 
-
-def tit_for_tat(GTsim, player_id):
-    """
-    tit_for_tat strategy
-
-    :param GTsim: Model
-    :param player_id: player id in the match
-    """
-    length = GTsim.t
-    if length == 0:
-        return 0
-    if player_id == 0:
-        return GTsim.config[length - 1][1]
-    else:
-        return GTsim.config[length - 1][0]
-
-
-def random(GTsim, player_id):
-    """
-    random strategy
-
-    :param GTsim: Model
-    :param player_id: player id in the match
-    """
-    return np.random.randint(0, 2)
-
-
 class GTsim(Model):
     """
     Simulation of two strategies playing agains eachother
@@ -53,20 +27,38 @@ class GTsim(Model):
 
     def __init__(self):
         Model.__init__(self)
+        """
+        p1_strat = the dictionary string value of the strat p1 should use
+        p2_strat = the dictionary string value of the strat p1 should use
+        height = the amount of games played in a matchup
 
-        # Adjustabel parameters
+        t = time in simulations, should not be tampered with outside of class
+        width = the amount of choices per player per timepoint (for prisoners dilemma should always be 2)
+        config = the moves per timepoint
+        rewards = the rewards that awarded to the players at different dicisions
+        live_scores = the cumulative scores per timepoint t for both players [score_p1, score_p2]
+        """
+
+        # Adjustable parameters
         self.make_param("p1_strat", "random")
         self.make_param("p2_strat", "random")
         self.make_param("height", 50)
 
-        # 
+        # config parameters
         self.t = 0
         self.width = 2
         self.config = None
+
+        # silent = 0, testify = 1
+        # punishment/reward [p1_rew, p2_rew]
+        # for rewards the indexes correspond to:
+        # i=0: both silent || i=1: p1-silent, p2-testify || i=2 p1-testify, p2-silent || i=3: both testify || 
+        self.rewards = [[3, 3], [0, 5], [5, 0], [1, 1]]
+
         self.live_scores = None
 
-        self.strat_library = {"tit_for_tat": tit_for_tat,
-                              "random": random,
+        self.strat_library = {"tit_for_tat": general_strats.tit_for_tat,
+                              "random": general_strats.random,
                               "traitor": bassies_strats.traitor,
                               "how_mean": strat_k.how_mean,
                               "weighted_decision": strat_k.weighted_decision,
@@ -77,11 +69,6 @@ class GTsim(Model):
                               "cry_baby": bassies_strats.easy_on_je_little_toes_gestept,
                               "eerlijk": bassies_strats.eerlijk,
                               "minder_eerlijk": bassies_strats.net_niet_helemaal_eerlijk}
-
-        # silent = 0, testify = 1
-        # punishment/reward [p1_rew, p2_rew] i=0: both silent, i=1: p1-silent
-        # || p2-testify, i=2 p1-testify || p2-silent, i=3: both testify
-        self.rewards = [[3, 3], [0, 5], [5, 0], [1, 1]]
 
     def execute_strat(self, strat):
         """
@@ -195,14 +182,6 @@ class GTsim(Model):
         plt.tight_layout()
 
 
-# for _ in range(500):
-#     sim.step()
-
-# from pyics import GUI
-# cx = GUI(sim)
-# cx.start()
-
-
 def battle(sim, strat1, strat2):
     """
     Does a battle between two strategies and gives the final score afther n moves
@@ -245,7 +224,6 @@ def battle(sim, strat1, strat2):
             sim.step()
         return sim.live_scores[-1]
 
-
 def tournament(strat):
     sim = GTsim()
 
@@ -256,7 +234,6 @@ def tournament(strat):
         points = battle(sim, strat, key)
         scores.append(points[0])
     return sum(scores)
-
 
 def result_matrix(sim, evostrat=False):
     """
